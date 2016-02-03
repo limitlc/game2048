@@ -1,0 +1,199 @@
+apply plugin: 'com.android.application'
+
+/**
+ *
+ * 获取时间戳
+ */
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyyMMdd')
+    return formattedDate
+}
+
+/**
+ *
+ * 从AndroidManifest.xml中获取版本号
+ * 这里面不行了
+ */
+def getVersionNameFromManifest() {
+    def manifestParser = new com.android.builder.core.DefaultManifestParser()
+    return manifestParser.getVersionName(android.sourceSets.main.manifest.srcFile)
+}
+
+android {
+    //这两个就是指定的编译SDK以及编辑工具版本 buildgradle版本
+    compileSdkVersion 23
+    buildToolsVersion "23.0.1"
+    /**
+     *  忽略编译错误
+     *  这个其实应该写到最后的，因为这个是设置 编译的 lint 开关。
+     *  程序在buid的时候，会执行lint检查，有任何的错误或者警告提示，都会终止构建，我们可以将其关掉。
+     */
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+
+    /**
+     * 配置签名文件 release＋debug
+     *
+     *这个可以不用自己创建，你可以在菜单栏点击 build/generate signed apk，
+     * 在其中选择你的文件或者创建签名文件，设置密码等等，然后选择记住密码，然后就会看见有这个配置了。
+     *
+     */
+    signingConfigs {
+        debug {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('debug.keystore')
+            storePassword 'android'
+
+        }
+        release {
+            keyAlias 'game'
+            keyPassword 'lichuang'
+            storeFile file('game.releasekey.jks')
+            storePassword 'lichuang'
+        }
+    }
+
+    /**
+     * 配置渠道名称
+     *在这里你可以设置你的产品发布的一些东西，
+     * 比如你现在一软件需要发布到不同渠道，且不同渠道中的包名不同，那么可以在此进行配置；甚至可以设
+     * 置不同的 AndroidManifest.xml 文件。
+     *
+     *
+     */
+    productFlavors {
+        update {}
+        baidu {}
+        anzhi {}
+        '360' {}
+        tengxun {}
+        '91' {}
+        jifeng {}
+        xiaomi {}
+        Nduo {}
+        appchina {}
+        wandoujia {}
+        oppo {}
+        '10086' {}
+        meizu {}
+        eoemarket {}
+        yiyonghui {}
+        huawei {}
+        talkphone {}
+        google {}
+        mumayi {}
+        woshangdian {}
+        leshangdian {}
+        aliyun {}
+        samsung {}
+        wangyi {}
+        taobao {}
+        pp {}
+        sougou {}
+        productFlavors.all { flavor ->
+            flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
+        }
+//        下面是举例配置不同的渠道的manifest
+//        flavor1 {
+//            packageName='com.lichuang.game2048'
+//            manifest.srcFile 'exampleapk/AndroidManifest1.xml'
+//        }
+
+    }
+
+    /**
+     * 批量打包修改生成的apk名字
+     */
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def oldFile = output.outputFile
+            if (variant.buildType.name.equals('release')) {
+                def releaseApkName = 'game2048_' + getDate() + '_v' + defaultConfig.versionName + '_' + variant.productFlavors[0].name + '_release' + '.apk'
+                output.outputFile = new File(oldFile.parent, releaseApkName)
+            }
+
+            if (variant.buildType.name.equals('debug')) {
+                def debugApkName = 'game2048_' + getDate() + '_v' + defaultConfig.versionName + '_' + variant.productFlavors[0].name + '_debug' + '.apk'
+                output.outputFile = new File(oldFile.parent, debugApkName)
+            }
+        }
+    }
+
+    /**
+     * 自然就是默认配置了，既然是默认配置那么久相当于全局配置，也就是说这里边配置的下面的 buildTypes 中也将自动继承了。
+     */
+    defaultConfig {
+        applicationId "com.paxw.game2048"
+        minSdkVersion 9
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+
+
+    /**
+     * 配置编译类型
+     * 在这里主要进行的配置是是否进行代码混淆，所以有一个代码混淆的开关，以及代码混淆的具体文件，文件有两种，无论哪种都行。
+     */
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+
+            minifyEnabled true
+
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+
+
+        }
+    }
+
+    /**
+     *java 版本的配置以便对应新版本的新特性
+     */
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+/**
+ * 其是很多从 Eclipse 中迁移过来的代码，大部分中都将带有这个设置，因为 Eclipse的文件夹与 AS 不尽相同，所以需要手动指定。
+ */
+    sourceSets {
+//        main {
+//            manifest.srcFile 'AndroidManifest.xml'
+//            java.srcDirs = ['src']
+//            resources.srcDirs = ['src']
+//            aidl.srcDirs = ['src']
+//            renderscript.srcDirs = ['src']
+//            res.srcDirs = ['res']
+//            assets.srcDirs = ['assets']
+//            jniLibs.srcDirs = ['libs']
+//        }
+
+    }
+    packagingOptions {
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/MANIFEST.MF'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    //依赖的一个远程库
+    //    compile project(':libname')           依赖的项目
+    compile files('libs/umeng-update-v2.6.0.1.jar')
+    compile 'com.umeng.analytics:analytics:latest.integration'
+}
