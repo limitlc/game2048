@@ -6,7 +6,7 @@
     <ImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@mipmap/ic_launcher"
+        android:background="@drawable/icon_launch"
         />
 
 </LinearLayout>

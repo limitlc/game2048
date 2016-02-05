@@ -317,8 +317,7 @@ public class My2048View extends LinearLayout implements View.OnTouchListener {
 
                             cardsMap[x][y].setNum(cardsMap[ x ][ y ].getNum() * 2);
                             cardsMap[x1][y].setNum(0);
-                            // FIXME: 2016/2/2 
-//                            score.addScore(cardsMap[x][y].getNum());
+                            score.addScore(cardsMap[x][y].getNum());
                             merge = true;
                         }
 
@@ -329,7 +328,7 @@ public class My2048View extends LinearLayout implements View.OnTouchListener {
         }
 
         if (merge) {
-//            addRandomNum();
+            addRandomNum();
             checkComplete();
         }
     }

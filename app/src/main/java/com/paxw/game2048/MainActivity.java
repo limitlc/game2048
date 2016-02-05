@@ -3,6 +3,7 @@ package com.paxw.game2048;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -10,7 +11,7 @@ import android.widget.TextView;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.update.UmengUpdateAgent;
 
-public class MainActivity extends AppCompatActivity implements Score.AddScoreListener {
+public class MainActivity extends AppCompatActivity implements Score.AddScoreListener, View.OnClickListener {
 
     private ActionBar supportActionBar;
     private My2048View gameView;
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements Score.AddScoreLis
         gameContainer.setLayoutParams(new LinearLayout.LayoutParams(Utils.getScreenWidth(this),Utils.getScreenWidth(this)));
         Score score = new Score(this,this);
         gameView.setScore(score);
+        btnNewGame.setOnClickListener(this);
     }
 
     @Override
@@ -61,5 +63,12 @@ public class MainActivity extends AppCompatActivity implements Score.AddScoreLis
     public void onPause() {
         super.onPause();
         MobclickAgent.onPause(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        gameView.startGame();
+        gameView.setScore(new Score(this,this));
+        score.setText(""+0);
     }
 }
